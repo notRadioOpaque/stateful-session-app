@@ -1,0 +1,16 @@
+{
+  "name": "my-session-app",
+  "scripts": {
+    "dev": "bun run --hot src/server.ts"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.44.7",
+    "hono": "^4.10.4"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "drizzle-kit": "^0.31.6"
+  }
+}
