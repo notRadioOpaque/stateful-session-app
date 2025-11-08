@@ -9,6 +9,37 @@ const auth = new Hono();
 
 const LIFE_TIME_IN_SECS = 60 * 60;
 
+auth.post("/register", async (c) => {
+  const { email, password } = await c.req.json();
+
+  if (!email || !password) {
+    return c.json({ error: "missing credentials" }, 400);
+  }
+
+  const [existingUser] = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email));
+
+  if (existingUser) {
+    return c.json({ error: "User already exists" }, 409);
+  }
+
+  const hash = await bcrypt.hash(password, 10);
+
+  await db
+    .insert(users)
+    .values({
+      email,
+      passwordHash: hash,
+    })
+    .returning();
+
+  // optionally you can auto login but i'll skip as it doesn't feel normal to me.
+
+  return c.json({ message: "Registered" });
+});
+
 auth.post("/login", async (c) => {
   const { email, password } = await c.req.json();
 
