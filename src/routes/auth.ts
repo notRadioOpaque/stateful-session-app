@@ -59,7 +59,7 @@ auth.post("/login", async (c) => {
     return c.json({ error: "Invalid credentials" }, 401);
   }
 
-  const sessionId = createSession(user.id, LIFE_TIME_IN_SECS);
+  const sessionId = await createSession(user.id, LIFE_TIME_IN_SECS);
 
   c.header(
     "Set-Cookie",
@@ -74,7 +74,7 @@ auth.post("/logout", async (c) => {
   const match = cookie.match("/sessionId=([^;]+)/");
 
   if (match) {
-    deleteSession(match[1]);
+    await deleteSession(match[1]);
   }
 
   // expire session
