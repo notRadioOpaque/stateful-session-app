@@ -8,12 +8,12 @@ export async function authMiddleware(c: Context, next: Next) {
   if (!match) return c.json({ error: "unathorized" }, 401);
 
   const sessionId = match[1];
-  const session = getSession(sessionId);
+  const session = await getSession(sessionId);
 
   if (!session) return c.json({ error: "unathorized" }, 401);
 
   // attach user context
-  c.set("userId", session.userId);
+  c.set("userId", session.userId.toString());
 
   return next();
 }
