@@ -1,11 +1,14 @@
 // here, I'm handling the state of this stateful authentication...
 
+import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { sessions } from "./schema";
 
 type Session = {
+  id: number;
+  sessionId: string;
   userId: number;
-  expiresAt: number;
+  expiresAt: Date;
 };
 
 export async function createSession(
@@ -24,20 +27,23 @@ export async function createSession(
   return sessionId;
 }
 
-export function getSession(sessionId: string): Session | null {
-  const session = sessions.get(sessionId);
+export async function getSession(sessionId: string): Promise<Session | null> {
+  const [sess] = await db
+    .select()
+    .from(sessions)
+    .where(eq(sessions.sessionId, sessionId));
 
-  if (!session) return null;
+  if (!sess) return null;
 
-  if (Date.now() > session.expiresAt) {
-    sessions.delete(sessionId);
+  if (sess.expiresAt.getTime() < Date.now()) {
+    await db.delete(sessions).where(eq(sessions.sessionId, sessionId));
 
     return null;
   }
 
-  return session;
+  return sess;
 }
 
-export function deleteSession(sessionId: string): void {
-  sessions.delete(sessionId);
+export async function deleteSession(sessionId: string): Promise<void> {
+  await db.delete(sessions).where(eq(sessions.sessionId, sessionId));
 }
