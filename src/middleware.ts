@@ -3,7 +3,6 @@ import { getSession } from "./session";
 
 export async function authMiddleware(c: Context, next: Next) {
   const cookie = c.req.header("Cookie") || "";
-  console.log("cookie", cookie);
   const match = cookie.match(/\bsessionId=([^;]+)/);
 
   if (!match) return c.json({ error: "unathorized" }, 401);
